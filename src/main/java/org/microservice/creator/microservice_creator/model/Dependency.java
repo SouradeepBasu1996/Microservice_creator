@@ -1,4 +1,4 @@
-package org.microservice.creator.microservice_creator.entity;
+package org.microservice.creator.microservice_creator.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

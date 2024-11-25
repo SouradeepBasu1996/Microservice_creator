@@ -1,6 +1,14 @@
-package org.microservice.creator.microservice_creator.entity;
+package org.microservice.creator.microservice_creator.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+
+import java.util.List;
+
 
 
 @Getter
@@ -15,7 +23,7 @@ public class ProjectConfig {
     private String artifactId;
     private BuildTool buildTool;
     private String description;
-    private String packaging;
+    private List<String> entity;
 
 
 }

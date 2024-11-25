@@ -2,8 +2,8 @@ package org.microservice.creator.microservice_creator.service;
 
 import lombok.AllArgsConstructor;
 import org.microservice.creator.microservice_creator.dto.ProjectRequestConfigDto;
-import org.microservice.creator.microservice_creator.entity.BuildTool;
-import org.microservice.creator.microservice_creator.entity.ProjectConfig;
+import org.microservice.creator.microservice_creator.model.BuildTool;
+import org.microservice.creator.microservice_creator.model.ProjectConfig;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -21,6 +22,7 @@ public class ProjectService {
 
     private TemplateProcesorService templateProcesorService;
     private FileService fileService;
+    private EntityService entityService;
 
     public File createProject(ProjectRequestConfigDto projectRequest)throws IOException{
 
@@ -38,6 +40,8 @@ public class ProjectService {
         createMainClass(config);
         createPom(config);
 
+        if (config.getEntity()!=null)
+            entityService.createEntityDir(projectDir,config);
         return zipProject(projectDir);
     }
 
@@ -54,6 +58,15 @@ public class ProjectService {
             if (!dir.mkdirs()) {
                 throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
             }
+        }
+    }
+
+    private void createEntity(File projectDir, List<String> entityList)throws IOException{
+        String path = "src/main/java/entity";
+
+        File dir = new File(projectDir,path);
+        if (!dir.mkdirs()) {
+            throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
         }
     }
     private void createPom(ProjectConfig config)throws IOException{
@@ -96,6 +109,10 @@ public class ProjectService {
 
         fileService.saveFile(processedMainClass,mainClassPath);
     }
+    private void createEntityClass(ProjectConfig projectConfig){
+        Map<String,String> placeHolder = new HashMap<>();
+
+    }
 
     private File zipProject(File projectDir) throws IOException {
         File zipFile = new File(projectDir.getParent(), projectDir.getName() + ".zip");
@@ -129,7 +146,7 @@ public class ProjectService {
 
     private void deleteDirectory(File directory) throws IOException {
         if (directory.isDirectory()) {
-            
+
             File[] files = directory.listFiles();
             if (files != null) {
                 for (File file : files) {
@@ -149,7 +166,7 @@ public class ProjectService {
                 .description(projectRequest.getDescription())
                 .groupId(projectRequest.getGroupId())
                 .buildTool(BuildTool.MAVEN)
-                .packaging("Jar")
+                .entity(projectRequest.getEntityList())
                 .build();
     }
 }
