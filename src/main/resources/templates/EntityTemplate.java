@@ -1,11 +1,17 @@
-package ${packageName}.${packageClass}.entity
+package ${packageName}.${packageClass}.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "${tableName}")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +19,6 @@ import lombok.Builder;
 @Builder
 public class ${entityName}{
 
-    private Long id;
+    ${fields}
 
 }

@@ -8,7 +8,7 @@ import lombok.Builder;
 
 
 import java.util.List;
-
+import java.util.Map;
 
 
 @Getter
@@ -23,7 +23,8 @@ public class ProjectConfig {
     private String artifactId;
     private BuildTool buildTool;
     private String description;
-    private List<String> entity;
+    private String controller;
+    private List<Map<String,List<EntityModel>>> entities;
 
 
 }

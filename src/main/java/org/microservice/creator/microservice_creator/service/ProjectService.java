@@ -39,8 +39,10 @@ public class ProjectService {
         createBasicStructure(projectDir);
         createMainClass(config);
         createPom(config);
+        createPropertiesFile(config);
+        createController(projectDir,config);
 
-        if (config.getEntity()!=null)
+        if (config.getEntities()!=null)
             entityService.createEntityDir(projectDir,config);
         return zipProject(projectDir);
     }
@@ -58,15 +60,6 @@ public class ProjectService {
             if (!dir.mkdirs()) {
                 throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
             }
-        }
-    }
-
-    private void createEntity(File projectDir, List<String> entityList)throws IOException{
-        String path = "src/main/java/entity";
-
-        File dir = new File(projectDir,path);
-        if (!dir.mkdirs()) {
-            throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
         }
     }
     private void createPom(ProjectConfig config)throws IOException{
@@ -109,9 +102,44 @@ public class ProjectService {
 
         fileService.saveFile(processedMainClass,mainClassPath);
     }
-    private void createEntityClass(ProjectConfig projectConfig){
-        Map<String,String> placeHolder = new HashMap<>();
 
+    private void createController(File projectDir ,ProjectConfig projectConfig)throws IOException{
+        String path = "src/main/java/"
+                + projectConfig.getGroupId().replace('.', '/')
+                + "/"
+                + projectConfig.getArtifactId()
+                +"/controller";
+
+        File dir = new File(projectDir,path);
+        if (!dir.mkdirs()) {
+            throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
+        }
+
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("packageName", projectConfig.getGroupId());
+        placeholders.put("packageClass", projectConfig.getProjectName());
+        placeholders.put("controller_name", projectConfig.getController());
+
+        Path templateControllerClassPath = Paths.get("src/main/resources/templates/ControllerTemplate.java");
+        String processedControllerClass = templateProcesorService.processTemplate(templateControllerClassPath,placeholders);
+
+        Path projectRootPath = Paths.get(System.getProperty("user.home"), "Downloads", projectConfig.getProjectName());
+        Path controllerPath = projectRootPath.resolve(path+"/"+projectConfig.getController()+".java");
+
+        fileService.saveFile(processedControllerClass,controllerPath);
+    }
+
+    private void createPropertiesFile(ProjectConfig projectConfig)throws IOException{
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("microservice_name", projectConfig.getProjectName());
+
+        Path templatePropertiesFile = Paths.get("src/main/resources/templates/temp_application.properties");
+        String processedPropertiesFile = templateProcesorService.processTemplate(templatePropertiesFile,placeholders);
+
+        Path projectRootPath = Paths.get(System.getProperty("user.home"), "Downloads", projectConfig.getProjectName());
+        Path propertiesFilePath = projectRootPath.resolve("src/main/resources/application.properties");
+
+        fileService.saveFile(processedPropertiesFile,propertiesFilePath);
     }
 
     private File zipProject(File projectDir) throws IOException {
@@ -166,7 +194,8 @@ public class ProjectService {
                 .description(projectRequest.getDescription())
                 .groupId(projectRequest.getGroupId())
                 .buildTool(BuildTool.MAVEN)
-                .entity(projectRequest.getEntityList())
+                .controller(projectRequest.getController())
+                .entities(projectRequest.getEntities())
                 .build();
     }
 }
