@@ -24,7 +24,8 @@ public class ProjectConfig {
     private BuildTool buildTool;
     private String description;
     private String controller;
-    private List<Map<String,List<EntityModel>>> entities;
+    private Map<String,List<EntityModel>> entities;
+    private DatabaseSpecs databaseSpecs;
 
 
 }
