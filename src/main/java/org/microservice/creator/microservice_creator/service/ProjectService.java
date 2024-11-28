@@ -23,6 +23,7 @@ public class ProjectService {
     private TemplateProcesorService templateProcesorService;
     private FileService fileService;
     private EntityService entityService;
+    private DatabaseService databaseService;
 
     public File createProject(ProjectRequestConfigDto projectRequest)throws IOException{
 
@@ -44,6 +45,10 @@ public class ProjectService {
 
         if (config.getEntities()!=null)
             entityService.createEntityDir(projectDir,config);
+
+        if(config.getDatabaseSpecs()!=null)
+            databaseService.fillDatabaseSpecs(projectDir, config);
+
         return zipProject(projectDir);
     }
 
@@ -196,6 +201,7 @@ public class ProjectService {
                 .buildTool(BuildTool.MAVEN)
                 .controller(projectRequest.getController())
                 .entities(projectRequest.getEntities())
+                .databaseSpecs(projectRequest.getDatabaseSpecs())
                 .build();
     }
 }

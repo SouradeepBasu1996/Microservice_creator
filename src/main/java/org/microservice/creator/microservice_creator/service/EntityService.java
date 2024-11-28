@@ -20,6 +20,7 @@ public class EntityService {
     private TemplateProcesorService templateProcesorService;
     private FileService fileService;
     private DataTypeService dataTypeService;
+    private RepositoryService repositoryService;
 
     public void createEntityDir(File projectDir, ProjectConfig config)throws IOException{
         String path = "src/main/java/"+config.getGroupId().replace('.', '/') + "/" +
@@ -29,13 +30,8 @@ public class EntityService {
         if (!dir.mkdirs()) {
             throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
         }
-        config.getEntities().forEach(entity-> {
-            try {
-                createEntity(entity,config);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        createEntity(config.getEntities(),config);
     }
 
     private void createEntity(Map<String,List<EntityModel>> entityMap, ProjectConfig config)throws IOException{
@@ -66,6 +62,8 @@ public class EntityService {
                     config.getGroupId().replace('.', '/') + "/" +
                     config.getArtifactId() + "/entity/"+entity.getKey()+".java");
             fileService.saveFile(processedEntity,entityClassPath);
+
+            repositoryService.createRepo(entity.getKey(),config);
         }
     }
 

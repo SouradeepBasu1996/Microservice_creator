@@ -1,6 +1,7 @@
 package org.microservice.creator.microservice_creator.dto;
 
 import lombok.*;
+import org.microservice.creator.microservice_creator.model.DatabaseSpecs;
 import org.microservice.creator.microservice_creator.model.EntityModel;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class ProjectRequestConfigDto {
     private String groupId;
     private String description;
     private String controller;
-    private List<Map<String,List<EntityModel>>> entities;
+    private Map<String,List<EntityModel>> entities;
+    private DatabaseSpecs databaseSpecs;
 
 }
