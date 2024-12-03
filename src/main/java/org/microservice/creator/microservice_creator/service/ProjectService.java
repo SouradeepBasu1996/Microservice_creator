@@ -24,6 +24,7 @@ public class ProjectService {
     private FileService fileService;
     private EntityService entityService;
     private DatabaseService databaseService;
+    private ServiceLayerService serviceLayerService;
 
     public File createProject(ProjectRequestConfigDto projectRequest)throws IOException{
 
@@ -45,6 +46,8 @@ public class ProjectService {
 
         if (config.getEntities()!=null)
             entityService.createEntityDir(projectDir,config);
+
+        serviceLayerService.createServiceClass(config);
 
         if(config.getDatabaseSpecs()!=null)
             databaseService.fillDatabaseSpecs(projectDir, config);
@@ -202,6 +205,7 @@ public class ProjectService {
                 .controller(projectRequest.getController())
                 .entities(projectRequest.getEntities())
                 .databaseSpecs(projectRequest.getDatabaseSpecs())
+                .serviceClassName(projectRequest.getServiceClassName())
                 .build();
     }
 }

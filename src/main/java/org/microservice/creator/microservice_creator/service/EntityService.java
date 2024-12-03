@@ -46,10 +46,11 @@ public class EntityService {
 
             StringBuilder fieldsBuilder = new StringBuilder();
             entity.getValue().forEach(entityModel -> {
-                fieldsBuilder.append("   @Column(name =\"")
+                fieldsBuilder.append("    @Column(name =\"")
                         .append(formatSnakeCase(entityModel.getFieldName()))
                         .append("\")\n")
-                        .append("   private ")
+                        .append("    ")
+                        .append("private ")
                         .append(dataTypeService.resolveDataType(entityModel.getDataType()))
                         .append(" ")
                         .append(entityModel.getFieldName())
