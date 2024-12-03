@@ -19,6 +19,8 @@ import jakarta.persistence.Table;
 @Builder
 public class ${entityName}{
 
-    ${fields}
+    @Id
+    private Long id;
+${fields}
 
 }

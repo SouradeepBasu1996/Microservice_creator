@@ -26,6 +26,7 @@ public class ProjectConfig {
     private String controller;
     private Map<String,List<EntityModel>> entities;
     private DatabaseSpecs databaseSpecs;
+    private String serviceClassName;
 
 
 }
