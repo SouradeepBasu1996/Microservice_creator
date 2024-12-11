@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -25,6 +24,8 @@ public class ProjectService {
     private EntityService entityService;
     private DatabaseService databaseService;
     private ServiceLayerService serviceLayerService;
+    //private ControllerService controllerService;
+    private ControllerService controllerService;
 
     public File createProject(ProjectRequestConfigDto projectRequest)throws IOException{
 
@@ -42,9 +43,10 @@ public class ProjectService {
         createMainClass(config);
         createPom(config);
         createPropertiesFile(config);
-        createController(projectDir,config);
+        //controllerService.createController(projectDir,config);
+        controllerService.createController(config);
 
-        if (config.getEntities()!=null)
+        if (config.getEntityClass()!=null)
             entityService.createEntityDir(projectDir,config);
 
         serviceLayerService.createServiceClass(config);
@@ -109,32 +111,6 @@ public class ProjectService {
                 config.getArtifactId() + "/"+className+".java");
 
         fileService.saveFile(processedMainClass,mainClassPath);
-    }
-
-    private void createController(File projectDir ,ProjectConfig projectConfig)throws IOException{
-        String path = "src/main/java/"
-                + projectConfig.getGroupId().replace('.', '/')
-                + "/"
-                + projectConfig.getArtifactId()
-                +"/controller";
-
-        File dir = new File(projectDir,path);
-        if (!dir.mkdirs()) {
-            throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
-        }
-
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("packageName", projectConfig.getGroupId());
-        placeholders.put("packageClass", projectConfig.getProjectName());
-        placeholders.put("controller_name", projectConfig.getController());
-
-        Path templateControllerClassPath = Paths.get("src/main/resources/templates/ControllerTemplate.java");
-        String processedControllerClass = templateProcesorService.processTemplate(templateControllerClassPath,placeholders);
-
-        Path projectRootPath = Paths.get(System.getProperty("user.home"), "Downloads", projectConfig.getProjectName());
-        Path controllerPath = projectRootPath.resolve(path+"/"+projectConfig.getController()+".java");
-
-        fileService.saveFile(processedControllerClass,controllerPath);
     }
 
     private void createPropertiesFile(ProjectConfig projectConfig)throws IOException{
@@ -203,7 +179,8 @@ public class ProjectService {
                 .groupId(projectRequest.getGroupId())
                 .buildTool(BuildTool.MAVEN)
                 .controller(projectRequest.getController())
-                .entities(projectRequest.getEntities())
+                .apiURL(projectRequest.getApiURL())
+                .entityClass(projectRequest.getEntityClass())
                 .databaseSpecs(projectRequest.getDatabaseSpecs())
                 .serviceClassName(projectRequest.getServiceClassName())
                 .build();

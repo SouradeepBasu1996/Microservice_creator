@@ -20,8 +20,8 @@ public class ServiceLayerService {
     private FileService fileService;
 
     public void createServiceClass(ProjectConfig config)throws IOException {
-        List<String> repositoryList = repositoryService.getRepositories();
-
+        //List<String> repositoryList = repositoryService.getRepositories();
+        String repositoryName = config.getEntityClass().getEntityName();
         Path templateServiceClassPath = Paths.get("src/main/resources/templates/ServiceClassTemplate.java");
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("packageName", config.getGroupId());
@@ -33,12 +33,12 @@ public class ServiceLayerService {
         StringBuilder crudBuilder = new StringBuilder();
         StringBuilder modelImportBuilder = new StringBuilder();
 
-        repositoryList.forEach(repository->{
-            repoBuilder.append("    private ")
-                    .append(repository)
+
+            repoBuilder.append("\tprivate ")
+                    .append(repositoryName)
                     .append("Repository")
                     .append(" ")
-                    .append(createRepositoryObj(repository))
+                    .append(createRepositoryObj(repositoryName))
                     .append("Repository")
                     .append(";\n");
 
@@ -50,22 +50,21 @@ public class ServiceLayerService {
                     .append(".")
                     .append("entity")
                     .append(".")
-                    .append(repository)
+                    .append(repositoryName)
                     .append(";\n");
-        });
-        repositoryList.forEach(repo->{
+
             importBuilder.append("import ")
                     .append(config.getGroupId())
                     .append(".")
                     .append(config.getProjectName())
                     .append(".")
                     .append("repository.")
-                    .append(repo)
+                    .append(repositoryName)
                     .append("Repository")
                     .append(";\n");
 
-            crudBuilder.append(createCRUDMethods(repo));
-        });
+            crudBuilder.append(createCRUDMethods(repositoryName));
+
         placeholders.put("imports",importBuilder.toString());
         placeholders.put("repositories",repoBuilder.toString());
         placeholders.put("crudMethods",crudBuilder.toString());

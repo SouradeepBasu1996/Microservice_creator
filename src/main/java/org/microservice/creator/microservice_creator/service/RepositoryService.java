@@ -19,7 +19,6 @@ public class RepositoryService {
 
     private TemplateProcesorService templateProcesorService;
     private FileService fileService;
-    List<String> repoList;
 
     public void createRepo(String modelClassName,ProjectConfig config)throws IOException {
         String path = "src/main/java/"+config.getGroupId().replace('.', '/') + "/" +
@@ -34,11 +33,6 @@ public class RepositoryService {
         String processedRepo = templateProcesorService.processTemplate(templateEntityPath,placeholders);
         Path projectRootPath = Paths.get(System.getProperty("user.home"), "Downloads", config.getProjectName());
         Path repoClassPath = projectRootPath.resolve(path+"/"+modelClassName+"Repository.java");
-        repoList.add(modelClassName);
         fileService.saveFile(processedRepo,repoClassPath);
-    }
-    public List<String> getRepositories(){
-
-        return repoList;
     }
 }
