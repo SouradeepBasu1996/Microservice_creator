@@ -1,6 +1,7 @@
 package org.microservice.creator.microservice_creator.service;
 
 import lombok.AllArgsConstructor;
+import org.microservice.creator.microservice_creator.model.EntityClass;
 import org.microservice.creator.microservice_creator.model.EntityModel;
 import org.microservice.creator.microservice_creator.model.ProjectConfig;
 import org.springframework.stereotype.Service;
@@ -31,21 +32,21 @@ public class EntityService {
             throw new IOException("Failed to create directory: " + dir.getAbsolutePath());
         }
 
-        createEntity(config.getEntities(),config);
+        createEntity(config.getEntityClass(),config);
     }
 
-    private void createEntity(Map<String,List<EntityModel>> entityMap, ProjectConfig config)throws IOException{
+    private void createEntity(EntityClass entityClass, ProjectConfig config)throws IOException{
 
         Path templateEntityPath = Paths.get("src/main/resources/templates/EntityTemplate.java");
-        for (Map.Entry<String,List<EntityModel>> entity:entityMap.entrySet()){
+
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("packageName", config.getGroupId());
             placeholders.put("packageClass", config.getProjectName());
-            placeholders.put("entityName",entity.getKey());
-            placeholders.put("tableName",formatSnakeCase(entity.getKey()));
+            placeholders.put("entityName", entityClass.getEntityName());
+            placeholders.put("tableName",formatSnakeCase(entityClass.getEntityName()));
 
             StringBuilder fieldsBuilder = new StringBuilder();
-            entity.getValue().forEach(entityModel -> {
+            entityClass.getFields().forEach(entityModel -> {
                 fieldsBuilder.append("    @Column(name =\"")
                         .append(formatSnakeCase(entityModel.getFieldName()))
                         .append("\")\n")
@@ -61,11 +62,11 @@ public class EntityService {
             Path projectRootPath = Paths.get(System.getProperty("user.home"), "Downloads", config.getProjectName());
             Path entityClassPath = projectRootPath.resolve("src/main/java/" +
                     config.getGroupId().replace('.', '/') + "/" +
-                    config.getArtifactId() + "/entity/"+entity.getKey()+".java");
+                    config.getArtifactId() + "/entity/"+entityClass.getEntityName()+".java");
             fileService.saveFile(processedEntity,entityClassPath);
 
-            repositoryService.createRepo(entity.getKey(),config);
-        }
+            repositoryService.createRepo(entityClass.getEntityName(),config);
+
     }
 
     private String formatSnakeCase(String fieldName){
